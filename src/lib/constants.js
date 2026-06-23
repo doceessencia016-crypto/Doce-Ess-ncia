@@ -1,0 +1,3 @@
+export const STORE_WHATSAPP_NUMBER = "5516982190044";
+export const PIX_DISCOUNT_RATE = 0.05;
+export const PIX_DISCOUNT_MIN_ORDER = 200;

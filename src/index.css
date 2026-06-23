@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cinzel", serif;
+  --font-sans: "Montserrat", sans-serif;
+
+  --color-rose: #cf8682;
+  --color-rose-dark: #ae396a;
+  --color-rose-light: #dd7774;
+  --color-cream: #f5e3d9;
+  --color-ink: #181818;
+  --color-ink-soft: #666666;
+  --color-gold: #dc8f38;
+  --color-mint: #4bb98c;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
