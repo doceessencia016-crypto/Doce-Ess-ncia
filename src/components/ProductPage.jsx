@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { getProductById, getSimilarProducts } from "../data/products";
+import { fetchProductById, fetchSimilarProducts } from "../lib/products";
 import { useCart } from "../context/CartContext";
 import ProductCard from "./ProductCard";
+import ImageCarousel from "./ImageCarousel";
 
 function formatPrice(value) {
   return value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -10,12 +11,30 @@ function formatPrice(value) {
 
 export default function ProductPage() {
   const { id } = useParams();
-  const product = getProductById(id);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes[0]);
+  const [product, setProduct] = useState(undefined);
+  const [similar, setSimilar] = useState([]);
+  const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setProduct(undefined);
+    fetchProductById(id).then((data) => {
+      setProduct(data);
+      setSelectedSize(data?.sizes[0] ?? null);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    if (!product) return;
+    fetchSimilarProducts(product).then(setSimilar);
+  }, [product]);
+
+  if (product === undefined) {
+    return <div className="max-w-3xl mx-auto px-4 py-20 text-center text-ink-soft">Carregando...</div>;
+  }
 
   if (!product) {
     return (
@@ -27,8 +46,6 @@ export default function ProductPage() {
       </div>
     );
   }
-
-  const similar = getSimilarProducts(product);
 
   function handleAddToCart() {
     addItem(product, selectedSize, quantity);
@@ -45,10 +62,11 @@ export default function ProductPage() {
       </nav>
 
       <div className="grid lg:grid-cols-2 gap-10">
-        <img
-          src={product.image}
+        <ImageCarousel
+          images={product.images}
           alt={product.name}
-          className="w-full aspect-[4/5] object-cover rounded-2xl"
+          imgClassName="w-full aspect-[4/5] object-cover rounded-2xl"
+          showDots
         />
 
         <div className="text-left">
@@ -58,7 +76,19 @@ export default function ProductPage() {
           </h1>
 
           <div className="mt-4">
-            <p className="font-sans text-2xl font-bold text-ink">R$ {formatPrice(selectedSize.price)}</p>
+            <div className="flex items-center gap-3">
+              {selectedSize.originalPrice > selectedSize.price && (
+                <p className="font-sans text-lg text-ink-soft line-through">
+                  R$ {formatPrice(selectedSize.originalPrice)}
+                </p>
+              )}
+              <p className="font-sans text-2xl font-bold text-ink">R$ {formatPrice(selectedSize.price)}</p>
+            </div>
+            {selectedSize.originalPrice > selectedSize.price && (
+              <p className="font-sans text-sm text-rose-dark font-semibold mt-0.5">
+                R$ {formatPrice(selectedSize.originalPrice - selectedSize.price)} a menos
+              </p>
+            )}
             <p className="font-sans text-sm text-ink-soft mt-1">{selectedSize.installments}</p>
             <p className="font-sans text-xs text-mint mt-1">5% OFF no Pix em pedidos acima de R$200</p>
           </div>

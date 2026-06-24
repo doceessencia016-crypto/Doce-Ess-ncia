@@ -20,3 +20,11 @@ body {
   color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Remove o ícone de busca visual (Lens/Visual Search) que navegadores
+   mostram ao passar o mouse sobre imagens. */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}

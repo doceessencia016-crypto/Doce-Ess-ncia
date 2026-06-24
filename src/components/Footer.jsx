@@ -84,9 +84,9 @@ export default function Footer() {
 
         <div>
           <h3 className="font-sans text-sm font-semibold uppercase tracking-wide text-ink mb-4">Pagamento</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-3">
             {["Pix", "Cartão"].map((p) => (
-              <span key={p} className="font-sans text-xs bg-white rounded px-3 py-1.5 border border-cream text-ink-soft">
+              <span key={p} className="font-sans text-xs text-ink-soft">
                 {p}
               </span>
             ))}
