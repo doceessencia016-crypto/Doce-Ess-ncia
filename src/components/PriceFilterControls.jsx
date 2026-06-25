@@ -1,6 +1,34 @@
-export default function PriceFilterControls({ sortOrder, setSortOrder, minPrice, setMinPrice, maxPrice, setMaxPrice }) {
+export default function PriceFilterControls({
+  sortOrder,
+  setSortOrder,
+  minPrice,
+  setMinPrice,
+  maxPrice,
+  setMaxPrice,
+  brands,
+  activeBrand,
+  setActiveBrand,
+}) {
   return (
     <div className="flex flex-wrap items-end gap-4">
+      {brands && brands.length > 0 && (
+        <div className="flex flex-col gap-1">
+          <label className="font-sans text-xs text-ink-soft">Marca</label>
+          <select
+            value={activeBrand ?? ""}
+            onChange={(e) => setActiveBrand(e.target.value || null)}
+            className="font-sans text-sm border border-cream rounded px-3 py-2 outline-none focus:border-rose bg-white"
+          >
+            <option value="">Todas</option>
+            {brands.map((brand) => (
+              <option key={brand} value={brand}>
+                {brand}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="flex flex-col gap-1">
         <label className="font-sans text-xs text-ink-soft">Ordenar por</label>
         <select

@@ -12,9 +12,15 @@ export default function ProductSection({ title, subtitle, products }) {
   const [sortOrder, setSortOrder] = useState("default");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [activeBrand, setActiveBrand] = useState(null);
 
   const categories = useMemo(
     () => [...new Set(products.map((p) => p.category))],
+    [products]
+  );
+
+  const brands = useMemo(
+    () => [...new Set(products.map((p) => p.brand).filter(Boolean))].sort(),
     [products]
   );
 
@@ -22,6 +28,10 @@ export default function ProductSection({ title, subtitle, products }) {
     let result = activeCategory
       ? products.filter((p) => p.category === activeCategory)
       : products;
+
+    if (activeBrand) {
+      result = result.filter((p) => p.brand === activeBrand);
+    }
 
     const min = minPrice !== "" ? Number(minPrice) : null;
     const max = maxPrice !== "" ? Number(maxPrice) : null;
@@ -39,7 +49,7 @@ export default function ProductSection({ title, subtitle, products }) {
     }
 
     return result;
-  }, [products, activeCategory, sortOrder, minPrice, maxPrice]);
+  }, [products, activeCategory, activeBrand, sortOrder, minPrice, maxPrice]);
 
   function scrollByCard(direction) {
     const container = scrollRef.current;
@@ -105,6 +115,9 @@ export default function ProductSection({ title, subtitle, products }) {
             setMinPrice={setMinPrice}
             maxPrice={maxPrice}
             setMaxPrice={setMaxPrice}
+            brands={brands}
+            activeBrand={activeBrand}
+            setActiveBrand={setActiveBrand}
           />
         </div>
       )}

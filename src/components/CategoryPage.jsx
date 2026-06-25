@@ -13,6 +13,7 @@ export default function CategoryPage() {
   const [sortOrder, setSortOrder] = useState("default");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [activeBrand, setActiveBrand] = useState(null);
 
   useEffect(() => {
     setProducts(undefined);
@@ -20,13 +21,19 @@ export default function CategoryPage() {
     setSortOrder("default");
     setMinPrice("");
     setMaxPrice("");
+    setActiveBrand(null);
     fetchProductsByCategory(categoryName).then(setProducts);
   }, [categoryName]);
+
+  const brands = useMemo(() => {
+    if (!products) return [];
+    return [...new Set(products.map((p) => p.brand).filter(Boolean))].sort();
+  }, [products]);
 
   const visibleProducts = useMemo(() => {
     if (!products) return [];
 
-    let result = products;
+    let result = activeBrand ? products.filter((p) => p.brand === activeBrand) : products;
     const min = minPrice !== "" ? Number(minPrice) : null;
     const max = maxPrice !== "" ? Number(maxPrice) : null;
     if (min != null || max != null) {
@@ -43,7 +50,7 @@ export default function CategoryPage() {
     }
 
     return result;
-  }, [products, sortOrder, minPrice, maxPrice]);
+  }, [products, activeBrand, sortOrder, minPrice, maxPrice]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
@@ -86,6 +93,9 @@ export default function CategoryPage() {
                 setMinPrice={setMinPrice}
                 maxPrice={maxPrice}
                 setMaxPrice={setMaxPrice}
+                brands={brands}
+                activeBrand={activeBrand}
+                setActiveBrand={setActiveBrand}
               />
             </div>
           )}

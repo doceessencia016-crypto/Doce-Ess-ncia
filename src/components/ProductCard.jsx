@@ -40,7 +40,10 @@ export default function ProductCard({ product }) {
         )}
       </div>
       <div className="p-4 text-left flex flex-col flex-1">
-        <p className="font-sans text-[11px] uppercase tracking-wide text-rose-dark">{product.category}</p>
+        <p className="font-sans text-[11px] uppercase tracking-wide text-rose-dark">
+          {product.category}
+          {product.brand && ` | ${product.brand}`}
+        </p>
         <h3 className="font-sans text-sm font-semibold text-ink mt-1 leading-snug">{product.name}</h3>
 
         <div className="flex gap-2 mt-3 min-h-[26px]">

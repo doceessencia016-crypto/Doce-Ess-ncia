@@ -8,6 +8,7 @@ function mapProduct(row) {
   return {
     id: row.id,
     name: row.name,
+    brand: row.brand,
     category: row.category,
     discount: row.discount_label,
     sold: row.sold_label,

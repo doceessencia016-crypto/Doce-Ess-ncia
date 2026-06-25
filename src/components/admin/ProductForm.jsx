@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Plus, Trash2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import {
@@ -56,6 +56,7 @@ export default function ProductForm() {
 
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [discountLabel, setDiscountLabel] = useState("");
@@ -68,6 +69,7 @@ export default function ProductForm() {
   const [isLoading, setIsLoading] = useState(isEditing);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const [duplicateProduct, setDuplicateProduct] = useState(null);
 
   useEffect(() => {
     supabase
@@ -91,6 +93,7 @@ export default function ProductForm() {
           return;
         }
         setName(data.name);
+        setBrand(data.brand ?? "");
         setDescription(data.description ?? "");
         setCategory(data.category);
         setDiscountLabel(data.discount_label ?? "");
@@ -161,6 +164,7 @@ export default function ProductForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setDuplicateProduct(null);
 
     const validSizes = sizes.filter(
       (s) => s.price && (s.sizeUnit === "unico" || s.sizeValue)
@@ -170,12 +174,31 @@ export default function ProductForm() {
       return;
     }
 
+    const trimmedBrand = brand.trim().toLowerCase();
+    let nameQuery = supabase.from("products").select("id, name, brand").ilike("name", name.trim());
+    if (isEditing) nameQuery = nameQuery.neq("id", id);
+    const { data: sameNameProducts, error: duplicateError } = await nameQuery;
+    if (duplicateError) {
+      setError(duplicateError.message);
+      return;
+    }
+    const duplicate = (sameNameProducts ?? []).find((p) => {
+      const existingBrand = (p.brand ?? "").trim().toLowerCase();
+      return !existingBrand || !trimmedBrand || existingBrand === trimmedBrand;
+    });
+    if (duplicate) {
+      setError("Já existe um produto cadastrado com esse nome e marca.");
+      setDuplicateProduct(duplicate);
+      return;
+    }
+
     setIsSaving(true);
     try {
       const finalImages = await uploadPendingImages();
 
       const payload = {
         name,
+        brand: brand.trim() || null,
         description,
         category,
         discount_label: discountLabel || null,
@@ -221,7 +244,19 @@ export default function ProductForm() {
 
       navigate("/admin/produtos");
     } catch (err) {
-      setError(err.message || "Erro ao salvar produto.");
+      if (err.code === "23505") {
+        const { data: existing } = await supabase
+          .from("products")
+          .select("id, name")
+          .ilike("name", name.trim())
+          .neq("id", id ?? "")
+          .limit(1)
+          .maybeSingle();
+        setError("Já existe um produto cadastrado com esse nome e marca.");
+        setDuplicateProduct(existing ?? null);
+      } else {
+        setError(err.message || "Erro ao salvar produto.");
+      }
     } finally {
       setIsSaving(false);
     }
@@ -241,6 +276,15 @@ export default function ProductForm() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
+          className="border border-cream rounded px-3 py-2 outline-none focus:border-rose bg-white"
+        />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-sm text-ink/70">Marca</label>
+        <input
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
           className="border border-cream rounded px-3 py-2 outline-none focus:border-rose bg-white"
         />
       </div>
@@ -427,7 +471,22 @@ export default function ProductForm() {
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="flex flex-col gap-2 bg-red-50 rounded px-3 py-2">
+          <p className="text-sm text-red-600">{error}</p>
+          {duplicateProduct && (
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm text-ink/80">{duplicateProduct.name}</span>
+              <Link
+                to={`/admin/produtos/${duplicateProduct.id}`}
+                className="shrink-0 text-sm text-rose hover:underline"
+              >
+                Editar produto existente
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-3">
         <button

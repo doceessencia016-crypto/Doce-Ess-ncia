@@ -10,6 +10,7 @@ function formatPrice(value) {
 
 const EMPTY_FORM = {
   nome: "",
+  whatsapp: "",
   cpf: "",
   cep: "",
   rua: "",
@@ -36,7 +37,7 @@ export default function CartPage() {
   }
 
   function validate() {
-    const required = ["nome", "cpf", "cep", "rua", "numero", "bairro", "cidade", "estado"];
+    const required = ["nome", "whatsapp", "cpf", "cep", "rua", "numero", "bairro", "cidade", "estado"];
     const newErrors = {};
     required.forEach((field) => {
       if (!form[field].trim()) newErrors[field] = "Campo obrigatório";
@@ -69,6 +70,7 @@ export default function CartPage() {
       "",
       "Dados para entrega:",
       `Nome: ${form.nome}`,
+      `WhatsApp: ${form.whatsapp}`,
       `CPF: ${form.cpf}`,
       `Endereço: ${form.rua}, ${form.numero}${form.complemento ? " - " + form.complemento : ""}`,
       `Bairro: ${form.bairro}`,
@@ -162,6 +164,7 @@ export default function CartPage() {
 
           <div className="space-y-3">
             <Field label="Nome completo" field="nome" form={form} errors={errors} onChange={handleChange} />
+            <Field label="WhatsApp" field="whatsapp" form={form} errors={errors} onChange={handleChange} type="tel" />
             <Field label="CPF" field="cpf" form={form} errors={errors} onChange={handleChange} />
             <Field label="CEP" field="cep" form={form} errors={errors} onChange={handleChange} />
             <Field label="Rua" field="rua" form={form} errors={errors} onChange={handleChange} />
@@ -203,14 +206,14 @@ export default function CartPage() {
   );
 }
 
-function Field({ label, field, form, errors, onChange, optional }) {
+function Field({ label, field, form, errors, onChange, optional, type = "text" }) {
   return (
     <div>
       <label className="font-sans text-xs text-ink-soft block mb-1">
         {label} {optional && <span className="text-ink-soft/60">(opcional)</span>}
       </label>
       <input
-        type="text"
+        type={type}
         value={form[field]}
         onChange={(e) => onChange(field, e.target.value)}
         className={`w-full font-sans text-sm border rounded-lg px-3 py-2 outline-none focus:border-rose transition-colors ${
