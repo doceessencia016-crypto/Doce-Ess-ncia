@@ -18,11 +18,18 @@ export async function saveLogoUrl(url) {
 
 export async function uploadLogo(file) {
   const ext = file.name.split(".").pop();
-  const path = `logo/logo.${ext}`;
+  const newPath = `logo/logo.${ext}`;
+
+  const { data: existing } = await supabase.storage.from("product-images").list("logo");
+  if (existing?.length) {
+    const toDelete = existing.map((f) => `logo/${f.name}`).filter((p) => p !== newPath);
+    if (toDelete.length) await supabase.storage.from("product-images").remove(toDelete);
+  }
+
   const { error } = await supabase.storage
     .from("product-images")
-    .upload(path, file, { upsert: true, contentType: file.type });
+    .upload(newPath, file, { upsert: true, contentType: file.type });
   if (error) throw error;
-  const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+  const { data } = supabase.storage.from("product-images").getPublicUrl(newPath);
   return `${data.publicUrl}?t=${Date.now()}`;
 }
