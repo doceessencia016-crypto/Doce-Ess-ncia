@@ -1,6 +1,6 @@
 import { useState } from "react";
-import logo from "../assets/logo-transparent.png";
 import TradePolicyModal from "./TradePolicyModal";
+import { useLogo } from "../context/LogoContext";
 import { STORE_WHATSAPP_NUMBER } from "../lib/constants";
 
 const WHATSAPP_MESSAGE = "Olá! 😊 Vim do site da Doce Essência e gostaria de saber mais.";
@@ -22,6 +22,7 @@ function InstagramIcon(props) {
 }
 
 export default function Footer() {
+  const { logoUrl } = useLogo();
   const [policyOpen, setPolicyOpen] = useState(false);
 
   return (
@@ -29,7 +30,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-10 text-left">
         <div>
           <a href="#" className="inline-block">
-            <img src={logo} alt="Doce Essência" className="h-24 w-auto" />
+            <img src={logoUrl} alt="Doce Essência" className="h-24 w-auto" />
           </a>
           <p className="font-sans text-sm text-ink-soft mt-3">
             Fragrâncias importadas, árabes, decants ou frascos inteiros, e produtos de cabelo e maquiagens selecionadas.

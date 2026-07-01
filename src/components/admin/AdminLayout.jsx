@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { to: "/admin/produtos", label: "Produtos" },
   { to: "/admin/categorias", label: "Categorias" },
   { to: "/admin/hero", label: "Fotos da Home" },
+  { to: "/admin/logo", label: "Logo" },
 ];
 
 export default function AdminLayout() {

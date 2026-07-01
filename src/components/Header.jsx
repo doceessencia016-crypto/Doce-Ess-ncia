@@ -1,26 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, Lock, ShoppingBag, Search } from "lucide-react";
-import logo from "../assets/logo-transparent.png";
 import { useCart } from "../context/CartContext";
+import { useLogo } from "../context/LogoContext";
 import { fetchSearchableProducts } from "../lib/products";
+import { fetchCategories } from "../lib/categories";
 import { searchProducts } from "../lib/search";
 
-const NAV_LINKS = [
-  "Perfumes de Nicho",
-  "Perfumes Importados",
-  "Perfumes Árabes",
-  "Kiko Milano",
-  "Victoria's Secret",
-  "Bath & Body Works",
-  "Produtos de Cabelo",
-];
-
 export default function Header() {
+  const { logoUrl } = useLogo();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [allProducts, setAllProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const { itemCount } = useCart();
   const navigate = useNavigate();
 
@@ -29,6 +22,12 @@ export default function Header() {
       fetchSearchableProducts().then(setAllProducts);
     }
   }, [menuOpen, searchOpen, allProducts.length]);
+
+  useEffect(() => {
+    if (menuOpen && categories.length === 0) {
+      fetchCategories().then(setCategories);
+    }
+  }, [menuOpen, categories.length]);
 
   const searchResults = searchProducts(allProducts, searchTerm);
 
@@ -61,7 +60,7 @@ export default function Header() {
         </button>
 
         <Link to="/" className="flex items-center justify-self-center">
-          <img src={logo} alt="Doce Essência" className="h-24 sm:h-28 w-auto" />
+          <img src={logoUrl} alt="Doce Essência" className="h-24 sm:h-28 w-auto" />
         </Link>
 
         <div className="flex items-center gap-5 text-ink justify-self-end">
@@ -130,14 +129,14 @@ export default function Header() {
           >
             Início
           </Link>
-          {NAV_LINKS.map((link) => (
+          {categories.map((category) => (
             <Link
-              key={link}
-              to={`/categoria/${encodeURIComponent(link)}`}
+              key={category.id}
+              to={`/categoria/${encodeURIComponent(category.name)}`}
               onClick={closeMenu}
               className="py-1 border-b border-cream/70 hover:text-rose transition-colors"
             >
-              {link}
+              {category.name}
             </Link>
           ))}
         </nav>

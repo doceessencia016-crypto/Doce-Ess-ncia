@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import Home from "./components/Home";
 import Footer from "./components/Footer";
 import { AdminAuthProvider } from "./context/AdminAuthContext";
+import { LogoProvider } from "./context/LogoContext";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 const ProductPage = lazy(() => import("./components/ProductPage"));
@@ -17,6 +18,7 @@ const ProductForm = lazy(() => import("./components/admin/ProductForm"));
 const CategoriesAdminList = lazy(() => import("./components/admin/CategoriesAdminList"));
 const CategoryForm = lazy(() => import("./components/admin/CategoryForm"));
 const HeroImagesAdmin = lazy(() => import("./components/admin/HeroImagesAdmin"));
+const LogoAdmin = lazy(() => import("./components/admin/LogoAdmin"));
 
 function PublicLayout({ children }) {
   return (
@@ -35,6 +37,7 @@ function PageFallback() {
 function App() {
   return (
     <AdminAuthProvider>
+      <LogoProvider>
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
@@ -59,9 +62,11 @@ function App() {
             <Route path="categorias/nova" element={<CategoryForm />} />
             <Route path="categorias/:id" element={<CategoryForm />} />
             <Route path="hero" element={<HeroImagesAdmin />} />
+            <Route path="logo" element={<LogoAdmin />} />
           </Route>
         </Routes>
       </Suspense>
+      </LogoProvider>
     </AdminAuthProvider>
   );
 }
